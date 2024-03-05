@@ -1053,7 +1053,7 @@ impl Player {
     }
 
     /// Create a new [`Player`].
-    pub fn new(ctx: &egui::Context, input_path: &String) -> Result<Self> {
+    pub fn new<P: AsRef<std::path::Path>>(ctx: &egui::Context, input_path: P) -> Result<Self> {
         let input_context = input(&input_path)?;
         let video_stream = input_context
             .streams()
@@ -1090,7 +1090,7 @@ impl Player {
             ctx.load_texture("vidstream", ColorImage::example(), options.texture_options);
         let (message_sender, message_reciever) = std::sync::mpsc::channel();
         let mut streamer = Self {
-            input_path: input_path.clone(),
+            input_path: input_path.as_ref().to_string_lossy().to_string(),
             audio_streamer: None,
             subtitle_streamer: None,
             video_streamer: Arc::new(Mutex::new(stream_decoder)),
