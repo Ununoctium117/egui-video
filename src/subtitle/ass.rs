@@ -25,7 +25,7 @@ fn tuple_float_2(v: Vec<f64>) -> Result<(f64, f64)> {
     Ok((*v.get(0).context(FAIL_TEXT)?, *v.get(1).context(FAIL_TEXT)?))
 }
 
-fn fad<'a>(i: &'a str) -> IResult<&'a str, SubtitleField> {
+fn fad<'a>(i: &'a str) -> IResult<&'a str, SubtitleField<'a>> {
     preceded(
         tag(r"\fad"),
         map(map_res(num_list, tuple_int_2), |f| {
@@ -38,7 +38,7 @@ fn fad<'a>(i: &'a str) -> IResult<&'a str, SubtitleField> {
     )(i)
 }
 
-fn t<'a>(i: &'a str) -> IResult<&'a str, SubtitleField> {
+fn t<'a>(i: &'a str) -> IResult<&'a str, SubtitleField<'a>> {
     preceded(
         tag(r"\t"),
         delimited(
@@ -51,7 +51,7 @@ fn t<'a>(i: &'a str) -> IResult<&'a str, SubtitleField> {
     )(i)
 }
 
-fn an<'a>(i: &'a str) -> IResult<&'a str, SubtitleField> {
+fn an<'a>(i: &'a str) -> IResult<&'a str, SubtitleField<'a>> {
     preceded(
         tag(r"\an"),
         map_res(digit1, |s: &str| match s.parse::<i64>() {
@@ -71,7 +71,7 @@ fn an<'a>(i: &'a str) -> IResult<&'a str, SubtitleField> {
     )(i)
 }
 
-fn pos<'a>(i: &'a str) -> IResult<&'a str, SubtitleField> {
+fn pos<'a>(i: &'a str) -> IResult<&'a str, SubtitleField<'a>> {
     preceded(
         tag(r"\pos"),
         map(map_res(num_list, tuple_float_2), |p| {
@@ -94,14 +94,14 @@ fn hex_to_color32(i: &str) -> IResult<&str, Color32> {
     let (i, (blue, green, red)) = tuple((hex_primary, hex_primary, hex_primary))(i)?;
     Ok((i, Color32::from_rgb(red, green, blue)))
 }
-fn c<'a>(i: &'a str) -> IResult<&'a str, SubtitleField> {
+fn c<'a>(i: &'a str) -> IResult<&'a str, SubtitleField<'a>> {
     delimited(
         alt((tag(r"\c&H"), tag(r"\1c&H"))),
         map(hex_to_color32, |c| SubtitleField::PrimaryFill(c)),
         tag("&"),
     )(i)
 }
-fn undefined<'a>(i: &'a str) -> IResult<&'a str, SubtitleField> {
+fn undefined<'a>(i: &'a str) -> IResult<&'a str, SubtitleField<'a>> {
     map(
         preceded(char('\\'), take_till(|c| "}\\".contains(c))),
         |s| SubtitleField::Undefined(s),
