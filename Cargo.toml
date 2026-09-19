@@ -31,7 +31,7 @@ tag = "2026.03.18"
 x86_64-pc-windows-msvc = { triplet = "x64-windows-static-md" }
 
 [dependencies]
-egui = "0.34"
+egui = "0.36"
 atomic = "0.5.3"
 ffmpeg-the-third = "1.2.2"
 anyhow = "1.0.75"
